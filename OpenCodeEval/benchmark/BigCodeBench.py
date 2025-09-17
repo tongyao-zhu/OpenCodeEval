@@ -5,7 +5,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 
 from OpenCodeEval.benchmark.base import Benchmark, PYTHON_STOP, PYTHON_IMPORTS
 from OpenCodeEval.utils import refine_text, stream_jsonl
-from OpenCodeEval.eval.func_eval import check_correctness
+from OpenCodeEval.eval.unit_test import check_correctness
 from OpenCodeEval.eval.sanitize import sanitize
 
 class BigCodeBench(Benchmark):
@@ -13,8 +13,8 @@ class BigCodeBench(Benchmark):
     name: str = "BigCodeBench"
     path: str = None
 
-    fullset_path = os.path.abspath(os.path.join(ROOT, "../data/BigCodeBench.jsonl"))
-    subset_path = os.path.abspath(os.path.join(ROOT, "../data/BigCodeBench_Hard.jsonl"))
+    fullset_path = "/home/aiops/zhuty/OpenCodeEval/OpenCodeEval/benchmark/data/BigCodeBench/full.jsonl"
+    subset_path = "/home/aiops/zhuty/OpenCodeEval/OpenCodeEval/benchmark/data/BigCodeBench/hard.jsonl"
 
     imports_code = PYTHON_IMPORTS
     chat_stop = PYTHON_STOP
@@ -22,19 +22,20 @@ class BigCodeBench(Benchmark):
 
     def __init__(self,
                  name: str = "BigCodeBench",
-                 timeout:float = 10.0,
+                 split: str="full",
+                 time_out:float = 10.0,
                  prompt_type: Literal["Completion", "Instruction"] = "Completion"
                  ):
         
         super().__init__()
         
         self.name = name
-        self.timeout = timeout
+        self.timeout = time_out
         self.prompt_type = prompt_type
 
-        if self.name == "BigCodeHard":
+        if split  == "hard":
             self.path = self.subset_path
-        elif self.name == "BigCodeBench":
+        elif split == "full":
             self.path = self.fullset_path
 
         self.tasks = self.get_task()

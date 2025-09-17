@@ -327,8 +327,8 @@ def reliability_guard(max_as_limit, max_data_limit, max_stack_limit):
     builtins.exit = None
     builtins.quit = None
 
-    import matplotlib.pyplot as plt
-    plt.close('all')
+    #import matplotlib.pyplot as plt
+    # plt.close('all')
 
 
 PASS = "pass"
@@ -360,7 +360,7 @@ def unsafe_execute(
         rmdir = os.rmdir
         chdir = os.chdir
         # Disable functionalities that can make destructive changes to the test.
-        reliability_guard(max_as_limit = 30720, max_data_limit = 30720, max_stack_limit = 10)
+        reliability_guard(max_as_limit = 50720, max_data_limit = 50720, max_stack_limit = 100)
         module_name = "__test__"
         new_module = types.ModuleType(module_name)
         # Set necessary attributes for the module
@@ -428,7 +428,7 @@ def check_correctness(
 
     result = {
         "task_id": task_id,
-        "solution_id": solution_id
+        "completion_id": solution_id
     }
     
     # shared memory objects
