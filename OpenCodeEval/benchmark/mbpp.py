@@ -122,6 +122,13 @@ class mbpp(Benchmark):
         if generation['completion'].startswith(self.few_shots_prompt):
             generation['completion'] = generation['completion'][len(self.few_shots_prompt):]
 
+        try:
+            # generation['completion'] = program_extract(generation['completion'], program="python", mode="last")
+            solution = sanitize(generation['completion'], entry_point)
+            # solution = solution.replace("func0", entry_point)
+        except Exception:
+            solution = program_extract(generation['completion'], program="python", mode="all")
+        
         return dict(
             task_id = generation['task_id'],
             completion_id = generation['completion_id'],
