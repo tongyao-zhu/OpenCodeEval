@@ -12,13 +12,14 @@ class HumanEval(Benchmark):
 
     imports_code = PYTHON_IMPORTS
     chat_stop = PYTHON_STOP
-    base_stop = ["\ndef ", "\nclass ", "\nimport ", "\nfrom ", "\nassert "]
+    base_stop = ["\ndef ", "\nclass ", "\nimport ", "\nfrom ", "\nassert ", "Your code here"]
 
     def __init__(
         self,
         split: Literal["base", "hard"] = "base",
         time_out: float = 3.0,
-        prompt_type: str = "Completion"
+        prompt_type: str = "Completion",
+        model_type: str = "Base"
     ):
 
         super().__init__()
@@ -58,7 +59,8 @@ class HumanEval(Benchmark):
             prompts.append(
                 dict(
                     task_id = task_id,
-                    prompt = refine_text(task_data['prompt'])
+                    # prompt = refine_text(task_data['prompt'])
+                    prompt = task_data['prompt']
                 )
             )
         return prompts
@@ -68,11 +70,19 @@ class HumanEval(Benchmark):
         Postprocess the generations.
         """
 
+        prompt = self.tasks[generation['task_id']]['prompt']
         entry_point = self.tasks[generation['task_id']]["entry_point"]
+        prompt_lines  = len([line for line in prompt.splitlines() if line.strip()])
 
         try:
-            generation['completion'] = generation['completion'].replace("func0", entry_point)
-            solution = sanitize(generation['completion'], entry_point)
+            lines = generation['completion'].splitlines()
+            lines = [line for line in lines if line.strip()][:prompt_lines + 20]
+            completion = '\n'.join(lines)
+
+            if '</think>' in completion:
+                completion = completion.split('</think>')[1]
+            
+            solution = sanitize(completion, entry_point)
         except Exception:
             solution = program_extract(generation['completion'], program="python", mode="all")
 

@@ -5,7 +5,7 @@ from loguru import logger
 from typing import Literal
 
 from OpenCodeEval.benchmark.base import Benchmark
-from OpenCodeEval.utils import refine_text, program_extract, markdown_extract, stream_jsonl
+from OpenCodeEval.utils import refine_text, program_extract, stream_jsonl
 from OpenCodeEval.eval.sql_test import check_correctness
 
 class Spider(Benchmark):
@@ -100,7 +100,7 @@ class Spider(Benchmark):
 
         db_path = os.path.join(self.database, f"{task_data['db_id']}/{task_data['db_id']}.sqlite")
 
-        result, passed = check_correctness(
+        result, passed,sql_return = check_correctness(
             solution['solution'],
             task_data['output'],
             db_path,
@@ -113,5 +113,6 @@ class Spider(Benchmark):
             completion_id = solution['completion_id'],
             passed = passed,
             result = result,
-            solution = solution['solution']
+            solution = solution['solution'],
+            sql_return = sql_return
         )

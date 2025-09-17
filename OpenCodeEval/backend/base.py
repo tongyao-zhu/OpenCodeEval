@@ -1,26 +1,4 @@
-from typing import Callable
 from abc import ABC, abstractmethod
-
-def make_chat_template(
-        prompt: str,
-        response_prefix: str = "",
-        is_chat: bool = True,
-        tokenizer: Callable = None
-    ) -> str:
-
-    if is_chat:
-        prompt = tokenizer.apply_chat_template(
-            [
-                {"role": "user", "content":  prompt},
-            ],
-            tokenize = False,
-            add_generation_prompt = True
-        ) + response_prefix
-        if tokenizer.bos_token and prompt.startswith(tokenizer.bos_token):
-            prompt = prompt[len(tokenizer.bos_token):]
-        return prompt
-    else:
-        return prompt
 
 class Generator(ABC):
 
@@ -53,3 +31,17 @@ class Generator(ABC):
             sample from the test dataset
         """
         pass
+
+    def _stop_at_stop_token(self, decoded_string, stop_tokens):
+        """
+        Produces the prefix of decoded_string that ends at the first occurrence of
+        a stop_token.
+        WARNING: the decoded_string *must not* include the prompt, which may have stop tokens
+        itself.
+        """
+        min_stop_index = len(decoded_string)
+        for stop_token in stop_tokens:
+            stop_index = decoded_string.find(stop_token)
+            if stop_index != -1 and stop_index < min_stop_index:
+                min_stop_index = stop_index
+        return decoded_string[:min_stop_index]
